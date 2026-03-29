@@ -1,9 +1,8 @@
 
-
-/* 2d. Basic Interactivity / Logic & 3a. Integration
-    Product data - THE WHAT: Changed image paths from ../Assets/ to Assets/ */
+/* 2d. Basic Interactivity / Logic & 3a. Integration 
+   Product data stored as array of objects */
 var products = [
-    { id: 1,  name: "Sharp Microwave",             category: "kitchen",       price: 18500,  image: "microwave.jpg" },
+    { id: 1,  name: "Sharp Microwave",               category: "kitchen",       price: 18500,  image: "microwave.jpg" },
     { id: 2,  name: "Oster Blender",                 category: "kitchen",       price: 7500,   image: "blender.jpg" },
     { id: 3,  name: "Philips Air Fryer",             category: "kitchen",       price: 22000,  image: "airfryer.jpg" },
     { id: 4,  name: "Samsung Refrigerator",          category: "kitchen",       price: 120000, image: "fridge.jpg" },
@@ -38,299 +37,215 @@ document.addEventListener('DOMContentLoaded', function() {
     updateCartIcon();
     setupMobileNav();
 
-    /* 2c. Form Validation - Login form */
+    if (document.querySelector('#productgrid')) { displayProducts(products); }
+    if (document.querySelector('#cart-container')) { displayCart(); }
+    if (document.querySelector('#checkout-summary')) { displayCheckoutSummary(); }
+
     var loginBtn = document.getElementById('loginbtn');
     if (loginBtn) {
-        loginBtn.addEventListener('click', function(event) {
-            event.preventDefault(); 
-            var username      = document.getElementById('login-username').value.trim();
-            var password      = document.getElementById('login-password').value.trim();
-            var usernameError = document.getElementById('username-error');
-            var passwordError = document.getElementById('password-error');
-            var isValid       = true;
+        loginBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            var userIn = document.getElementById('login-username').value.trim();
+            var passIn = document.getElementById('login-password').value.trim();
+            
+            /* 2d. Logic: Retrieve saved registration data*/
+            var savedUser = JSON.parse(localStorage.getItem('ippliance_user'));
 
-            if (username === '') {
-                usernameError.style.display = 'block';
-                isValid = false;
+            if (savedUser && savedUser.username === userIn && savedUser.password === passIn) {
+                alert('Welcome back to I-ppliance!');
+                window.location.href = 'index.html';
             } else {
-                usernameError.style.display = 'none';
+                alert('Invalid credentials. Please make sure you have registered.');
             }
+        });
+    }
 
-            if (password === '') {
-                passwordError.style.display = 'block';
-                isValid = false;
+    /* 2c. Form Validation / Input Handling */
+    var registerBtn = document.getElementById('registerbtn');
+    if (registerBtn) {
+        registerBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            var fname = document.getElementById('firstname').value.trim();
+            var user  = document.getElementById('username').value.trim();
+            var pass  = document.getElementById('reg-password').value.trim();
+
+            if (fname !== '' && user !== '' && pass !== '') {
+                /* 2d. Logic: Save user info to localStorage */
+                var userData = { firstname: fname, username: user, password: pass };
+                localStorage.setItem('ippliance_user', JSON.stringify(userData));
+                
+                alert('Registration successful, ' + fname + '! Redirecting to Login.');
+                window.location.href = 'login.html';
             } else {
-                passwordError.style.display = 'none';
+                alert('Please fill in all registration fields.');
             }
+        });
+    }
+
+    /* 2c. Form Validation / Input Handling */
+    var confirmOrderBtn = document.getElementById('confirm-order-btn');
+    if (confirmOrderBtn) {
+        confirmOrderBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            var lastname = document.getElementById('lastname').value.trim();
+            var email    = document.getElementById('email').value.trim();
+            var phone    = document.getElementById('phone').value.trim();
+            var address  = document.getElementById('address').value.trim();
+            var parish   = document.getElementById('parish').value;
+
+            var isValid = true;
+
+            if (lastname === '') { document.getElementById('user-lname-error').style.display = 'block'; isValid = false; }
+            else { document.getElementById('user-lname-error').style.display = 'none'; }
+
+            if (email === '' || !email.includes('@')) { document.getElementById('user-email-error').style.display = 'block'; isValid = false; }
+            else { document.getElementById('user-email-error').style.display = 'none'; }
+
+            if (phone === '') { document.getElementById('user-phone-error').style.display = 'block'; isValid = false; }
+            else { document.getElementById('user-phone-error').style.display = 'none'; }
+
+            if (address === '') { document.getElementById('user-address-error').style.display = 'block'; isValid = false; }
+            else { document.getElementById('user-address-error').style.display = 'none'; }
+
+            if (parish === '') { document.getElementById('user-parish-error').style.display = 'block'; isValid = false; }
+            else { document.getElementById('user-parish-error').style.display = 'none'; }
 
             if (isValid) {
-                alert('Welcome back, ' + username + '!');
+                alert('Thank you for your order! It is now being processed.');
+                localStorage.removeItem('ippliance_cart'); 
                 window.location.href = 'index.html';
             }
         });
     }
 
-    /* 2c. Form Validation - Register form */
-    var registerBtn = document.getElementById('registerbtn');
-    if (registerBtn) {
-        registerBtn.addEventListener('click', function(event) {
-            event.preventDefault(); 
-
-            var fname     = document.getElementById('firstname').value.trim();
-            var lname     = document.getElementById('lastname').value.trim();
-            var email     = document.getElementById('email').value.trim();
-            var dob       = document.getElementById('dob').value;
-            var username  = document.getElementById('username').value.trim();
-            var password  = document.getElementById('reg-password').value.trim();
-            var cpassword = document.getElementById('reg-cpassword').value.trim();
-            var isValid   = true;
-
-            // Helper to toggle errors
-            var checkField = function(val, id) {
-                if (val === '') {
-                    document.getElementById(id).style.display = 'block';
-                    isValid = false;
-                } else {
-                    document.getElementById(id).style.display = 'none';
-                }
-            };
-
-            checkField(fname, 'user-fname-error');
-            checkField(lname, 'user-lname-error');
-            checkField(dob, 'user-dob-error');
-            checkField(username, 'username-error');
-            checkField(password, 'user-password-error');
-
-            if (email === '' || !email.includes('@')) {
-                document.getElementById('user-email-error').style.display = 'block';
-                isValid = false;
-            } else {
-                document.getElementById('user-email-error').style.display = 'none';
-            }
-
-            if (cpassword !== password || cpassword === '') {
-                document.getElementById('user-cpassword-error').style.display = 'block';
-                isValid = false;
-            } else {
-                document.getElementById('user-cpassword-error').style.display = 'none';
-            }
-
-            if (isValid) {
-                alert('Registration successful! Welcome, ' + fname + '!');
-                window.location.href = 'login.html';
-            }
-        });
-    }
-
-    /* 2c. Form Validation - Confirm order button 
-       THE WHAT: Looking for 'confirm-btn' to match the HTML fix */
-    var confirmBtn = document.getElementById('confirm-btn') || document.getElementById('confirm-order-btn');
-    if (confirmBtn) {
-        confirmBtn.addEventListener('click', function(event) {
-            event.preventDefault(); 
-            confirmCheckout();
-        });
-    }
-
-    /* Checkout button navigation */
-    var cancelBtn = document.getElementById('cancel-btn');
-    var clearBtn  = document.getElementById('clear-btn');
-    var closeBtn  = document.getElementById('close-btn');
-
-    if (cancelBtn) { cancelBtn.addEventListener('click', function(e) { e.preventDefault(); window.location.href = 'cart.html'; }); }
-    if (clearBtn)  { clearBtn.addEventListener('click',  function(e) { e.preventDefault(); document.getElementById('checkout-form').reset(); }); }
-    if (closeBtn)  { closeBtn.addEventListener('click',  function(e) { e.preventDefault(); window.location.href = 'index.html'; }); }
-
-    /* Page-specific loaders */
-    if (document.querySelector('#productgrid')) { displayProducts(products); }
-    if (document.querySelector('#cart-container')) { displayCart(); }
-    if (document.querySelector('#checkout-summary')) { displayCheckoutSummary(); }
-
-    /* Category filtering */
+    /* 2b. Event Handling: Category Filter */
     var categoryBtns = document.querySelectorAll('.category-btn');
-    for (var i = 0; i < categoryBtns.length; i++) {
-        categoryBtns[i].addEventListener('click', function() {
+    categoryBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
             var category = this.getAttribute('data-category');
-            for (var j = 0; j < categoryBtns.length; j++) {
-                categoryBtns[j].classList.remove('active');
-            }
+            categoryBtns.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
-
-            if (category === 'all') {
-                displayProducts(products);
-            } else {
-                var filtered = products.filter(p => p.category === category);
-                displayProducts(filtered);
-            }
+            var filtered = (category === 'all') ? products : products.filter(p => p.category === category);
+            displayProducts(filtered);
         });
-    }
+    });
 });
 
-/* 2a. DOM Manipulation - Render products */
-function displayProducts(productsToDisplay) {
-    var productGrid = document.querySelector('#productgrid');
-    if (!productGrid) return;
-    productGrid.innerHTML = '';
+/* 2a. DOM Manipulation */
 
-    productsToDisplay.forEach(product => {
-        productGrid.innerHTML +=
-            '<div class="product-card">' +
-                '<img src="' + product.image + '" alt="' + product.name + '">' +
-                '<h3>' + product.name + '</h3>' +
-                '<p class="price">J$' + product.price.toLocaleString() + '</p>' +
-                '<button class="btn add-to-cart-btn" data-id="' + product.id + '">Add to Cart</button>' +
-            '</div>';
-    });
-
-    document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            addToCart(parseInt(this.getAttribute('data-id')));
-        });
+function displayProducts(list) {
+    var grid = document.querySelector('#productgrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    list.forEach(item => {
+        grid.innerHTML += `
+            <div class="product-card">
+                <img src="${item.image}" alt="${item.name}">
+                <h3>${item.name}</h3>
+                <p class="price">J$${item.price.toLocaleString()}</p>
+                <button class="btn" onclick="addToCart(${item.id})">Add to Cart</button>
+            </div>`;
     });
 }
 
-/* 2d. Cart Logic */
-function addToCart(productId) {
+function addToCart(id) {
     var cart = JSON.parse(localStorage.getItem('ippliance_cart')) || [];
-    var product = products.find(p => p.id === productId);
-    var existingItem = cart.find(item => item.id === productId);
+    var product = products.find(p => p.id === id);
+    var existing = cart.find(item => item.id === id);
 
-    if (existingItem) {
-        existingItem.quantity += 1;
-    } else {
-        cart.push({ ...product, quantity: 1 });
-    }
+    if (existing) { existing.quantity += 1; }
+    else { cart.push({...product, quantity: 1}); }
 
     localStorage.setItem('ippliance_cart', JSON.stringify(cart));
-    alert(product.name + ' added to cart!');
     updateCartIcon();
+    alert(product.name + ' added to cart!');
 }
 
-/* 2a. DOM Manipulation - Render Cart */
 function displayCart() {
-    var cartContainer = document.querySelector('#cart-container');
+    var container = document.querySelector('#cart-container');
     var cart = JSON.parse(localStorage.getItem('ippliance_cart')) || [];
-    if (!cartContainer) return;
+    if (!container) return;
 
     if (cart.length === 0) {
-        cartContainer.innerHTML = '<h3>Your cart is empty.</h3>';
+        container.innerHTML = '<h3>Your cart is empty.</h3><a href="index.html" class="btn">Browse Products</a>';
         return;
     }
 
-    var subtotal = 0;
-    var cartHTML = cart.map(item => {
-        var itemTotal = item.price * item.quantity;
-        subtotal += itemTotal;
-        return '<div class="cart-item">' +
-                '<img src="' + item.image + '" alt="' + item.name + '" class="cart-img">' +
-                '<div><h4>' + item.name + '</h4><p>J$' + item.price.toLocaleString() + ' x ' + item.quantity + '</p></div>' +
-                '<p><strong>J$' + itemTotal.toLocaleString() + '</strong></p>' +
-                '<button class="btn remove-btn" data-id="' + item.id + '">Remove</button>' +
-            '</div>';
-    }).join('');
-
-    var tax = Math.round(subtotal * 0.15);
-    var total = subtotal + tax;
-
-    cartHTML += '<div class="cart-total">' +
-            '<p>Subtotal: J$' + subtotal.toLocaleString() + '</p>' +
-            '<p>GCT (15%): J$' + tax.toLocaleString() + '</p>' +
-            '<h3>Total: J$' + total.toLocaleString() + '</h3>' +
-            '<a href="checkout.html"><button class="btn checkout-link-btn">Proceed to Checkout</button></a>' +
-            '<button class="btn" id="clear-cart-btn" style="margin-top:10px;">Clear Cart</button>' +
-        '</div>';
-
-    cartContainer.innerHTML = cartHTML;
-
-    document.querySelectorAll('.remove-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            removeFromCart(parseInt(this.getAttribute('data-id')));
-        });
-    });
-
-    var clearBtn = document.getElementById('clear-cart-btn');
-    if (clearBtn) {
-        clearBtn.addEventListener('click', function() {
-            localStorage.removeItem('ippliance_cart');
-            displayCart();
-            updateCartIcon();
-        });
-    }
-}
-
-/* 2a. Order Summary Loader */
-function displayCheckoutSummary() {
-    var summary = document.querySelector('#checkout-summary');
-    var cart = JSON.parse(localStorage.getItem('ippliance_cart')) || [];
-    if (!summary || cart.length === 0) return;
-
-    var subtotal = 0;
-    var html = '<h3>Order Summary</h3>';
+    let total = 0;
+    let html = '<h2>Shopping Cart</h2>';
     cart.forEach(item => {
-        var itemTotal = item.price * item.quantity;
-        subtotal += itemTotal;
-        html += '<p>' + item.name + ' x' + item.quantity + ' — J$' + itemTotal.toLocaleString() + '</p>';
+        total += item.price * item.quantity;
+        html += `
+            <div class="cart-item">
+                <img src="${item.image}" class="cart-img" style="width: 80px;">
+                <div><h4>${item.name}</h4><p>J$${item.price.toLocaleString()} x ${item.quantity}</p></div>
+                <button class="btn remove-btn" onclick="removeFromCart(${item.id})">Remove</button>
+            </div>`;
     });
 
-    var tax = Math.round(subtotal * 0.15);
-    var total = subtotal + tax;
-    html += '<hr><p>Subtotal: J$' + subtotal.toLocaleString() + '</p><p>GCT (15%): J$' + tax.toLocaleString() + '</p><h3>Total: J$' + total.toLocaleString() + '</h3>';
-    summary.innerHTML = html;
-
-    var amt = document.getElementById('amount');
-    if (amt) amt.value = 'J$' + total.toLocaleString();
+    html += `
+        <div class="cart-total">
+            <h3>Total: J$${total.toLocaleString()}</h3>
+            <button id="clear-cart-btn" class="btn" onclick="clearCart()">Clear Cart</button>
+            <a href="checkout.html" class="btn checkout-link-btn">Checkout</a>
+        </div>`;
+    container.innerHTML = html;
 }
 
 function removeFromCart(id) {
     var cart = JSON.parse(localStorage.getItem('ippliance_cart')) || [];
-    var newCart = cart.filter(item => item.id !== id);
-    localStorage.setItem('ippliance_cart', JSON.stringify(newCart));
+    cart = cart.filter(item => item.id !== id);
+    localStorage.setItem('ippliance_cart', JSON.stringify(cart));
+    displayCart();
+    updateCartIcon();
+}
+
+function clearCart() {
+    localStorage.removeItem('ippliance_cart');
     displayCart();
     updateCartIcon();
 }
 
 function updateCartIcon() {
     var cart = JSON.parse(localStorage.getItem('ippliance_cart')) || [];
-    var count = cart.reduce((acc, item) => acc + item.quantity, 0);
-    document.querySelectorAll('nav a').forEach(link => {
-        if (link.textContent.toLowerCase().includes('cart')) {
-            link.innerHTML = 'Cart (' + count + ')';
+    var count = cart.reduce((sum, item) => sum + item.quantity, 0);
+    
+    // Find all links in the navigation
+    var navLinks = document.querySelectorAll('nav a');
+    
+    // Loop through them to find the Cart link and update it dynamically
+    navLinks.forEach(link => {
+        if (link.getAttribute('href') === 'cart.html' || link.textContent.toLowerCase().includes('cart')) {
+            if (count > 0) {
+                link.innerText = 'Cart (' + count + ')';
+            } else {
+                link.innerText = 'Cart';
+            }
         }
     });
+}
+
+function displayCheckoutSummary() {
+    var container = document.querySelector('#checkout-summary');
+    var cart = JSON.parse(localStorage.getItem('ippliance_cart')) || [];
+    if (!container) return;
+
+    let total = 0;
+    let html = '<h3>Order Summary</h3><ul style="list-style:none; padding:0;">';
+    cart.forEach(item => {
+        total += item.price * item.quantity;
+        html += `<li>${item.name} (x${item.quantity}) - J$${(item.price * item.quantity).toLocaleString()}</li>`;
+    });
+    html += `</ul><hr><h4>Grand Total: J$${total.toLocaleString()}</h4>`;
+    container.innerHTML = html;
 }
 
 function setupMobileNav() {
-    var btn = document.querySelector('.mobile-nav-button');
+    var menuBtn = document.querySelector('.mobile-nav-button');
     var nav = document.querySelector('nav');
-    if (btn && nav) btn.onclick = () => nav.classList.toggle('active');
-}
-
-/* 2c. Final Validation Logic - Matches Spans in checkout.html */
-function confirmCheckout() {
-    var fields = [
-        { id: 'firstname', error: 'user-fname-error' },
-        { id: 'lastname',  error: 'user-lname-error' },
-        { id: 'email',     error: 'user-email-error' },
-        { id: 'phone',     error: 'user-phone-error' },
-        { id: 'address',   error: 'user-address-error' },
-        { id: 'parish',    error: 'user-parish-error' }
-    ];
-
-    var isValid = true;
-    fields.forEach(field => {
-        var val = document.getElementById(field.id).value.trim();
-        var err = document.getElementById(field.error);
-        if (val === '' || val === 'Select Parish') {
-            err.style.display = 'block';
-            isValid = false;
-        } else {
-            err.style.display = 'none';
-        }
-    });
-
-    if (isValid) {
-        alert('Order confirmed! Thank you for shopping with I-ppliance.');
-        localStorage.removeItem('ippliance_cart');
-        window.location.href = 'index.html';
+    if (menuBtn && nav) {
+        menuBtn.addEventListener('click', function() {
+            nav.classList.toggle('active');
+        });
     }
 }
