@@ -456,6 +456,27 @@ footer p {
     }
 }
 
+
+/* --- CHECKOUT PAGE SPECIFICS --- */
+#checkout-wide-card {
+    max-width: 800px; /* Stretches the card to remove negative space */
+}
+
+#checkout-summary {
+    max-width: 100%; 
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+#clear-btn {
+    background-color: var(--error-red); /* Keeps only the destructive action red */
+}
+
 /* 1b Layout - Desktop view min 950px */
 @media screen and (min-width: 950px) {
     #productgrid { grid-template-columns: repeat(3, 1fr); }
