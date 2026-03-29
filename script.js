@@ -1,9 +1,3 @@
-/* ============================================
-   IA#2 - script.js - I-ppliance
-   Student: John-Mark Whittick | ID#: 1907528
-   Module: CIT2011 | Assignment: IA#2 (Individual)
-   ============================================ */
-
 /* 2d. Logic: data storage and organization using arrays and objects */
 var products = [
     { id: 1,  name: "Sharp Microwave",               category: "kitchen",       price: 18500,  image: "microwave.jpg" },
