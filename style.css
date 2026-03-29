@@ -461,6 +461,7 @@ footer p {
 #checkout-wide-card {
     max-width: 800px; /* Stretches the checkout card */
     width: 100%;
+    margin: 0 auto;
 }
 
 .form-actions {
