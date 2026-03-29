@@ -1,8 +1,4 @@
-/* ============================================
-   IA#2 - script.js - I-ppliance
-   Student: John-Mark Whittick | ID#: 1907528
-   Module: CIT2011 | Assignment: IA#2 Sem.2/AY.25/26
-   ============================================ */
+
 
 /* 2d. Basic Interactivity / Logic & 3a. Integration
     Product data - THE WHAT: Changed image paths from ../Assets/ to Assets/ */
