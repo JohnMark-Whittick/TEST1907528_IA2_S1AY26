@@ -155,12 +155,13 @@ h1, h2 {
 }
 
 /* 1d Code Quality - Specific overrides to stop buttons from stretching */
-#confirm-btn, #confirm-order-btn, #cancel-btn, #clear-btn, 
-#close-btn, #clear-cart-btn, .checkout-link-btn, .remove-btn {
+/* 1d Code Quality - ID selectors make checkout buttons not full width */
+#confirm-order-btn, #cancel-btn, #clear-btn, #close-btn, #clear-cart-btn,
+.cart-item .btn, .summary .btn, #cart-container .btn {
     width: auto;
     display: inline-block;
-    padding: 12px 24px;
     margin-right: 10px;
+    padding: 10px 20px;
 }
 
 /* Specific color for the Clear Cart button */
