@@ -54,14 +54,37 @@ document.addEventListener('DOMContentLoaded', function() {
             var userIn = document.getElementById('login-username').value.trim();
             var passIn = document.getElementById('login-password').value.trim();
             
-            var savedUser = JSON.parse(localStorage.getItem('ippliance_user'));
+            var userErr = document.getElementById('username-error');
+            var passErr = document.getElementById('password-error');
+            var isValid = true;
 
-            /* 2d. Logic control structure if/else for login verification */
-            if (savedUser && savedUser.username === userIn && savedUser.password === passIn) {
-                alert('Welcome back to I-ppliance!');
-                window.location.href = 'index.html';
+            /* 2c. Form Validation to check if login fields are empty */
+            if (userIn === '') {
+                if (userErr) { userErr.innerText = 'Username is required'; userErr.style.display = 'block'; }
+                isValid = false;
             } else {
-                alert('Invalid credentials. Please make sure you have registered.');
+                if (userErr) userErr.style.display = 'none';
+            }
+
+            if (passIn === '') {
+                if (passErr) { passErr.innerText = 'Password is required'; passErr.style.display = 'block'; }
+                isValid = false;
+            } else {
+                if (passErr) passErr.style.display = 'none';
+            }
+
+            if (isValid) {
+                var savedUser = JSON.parse(localStorage.getItem('ippliance_user'));
+
+                /* 2d. Logic control structure if/else for login verification */
+                if (savedUser && savedUser.username === userIn && savedUser.password === passIn) {
+                    alert('Welcome back to I-ppliance!');
+                    window.location.href = 'index.html';
+                } else {
+                    /* 2a. DOM Manipulation to dynamically update error text for mismatched credentials */
+                    if (userErr) { userErr.innerText = 'Invalid credentials'; userErr.style.display = 'block'; }
+                    if (passErr) { passErr.innerText = 'Invalid credentials'; passErr.style.display = 'block'; }
+                }
             }
         });
     }
@@ -72,42 +95,59 @@ document.addEventListener('DOMContentLoaded', function() {
         registerBtn.addEventListener('click', function(e) {
             e.preventDefault();
             
-            // Grab all values from the form
-            var fname = document.getElementById('firstname').value.trim();
-            var lname = document.getElementById('lastname').value.trim();
-            var email = document.getElementById('email').value.trim();
-            var dob   = document.getElementById('dob').value.trim();
-            var user  = document.getElementById('username').value.trim();
-            var pass  = document.getElementById('reg-password').value.trim();
-            var cpass = document.getElementById('reg-cpassword').value.trim(); 
+            // 2c. Safely connect to the input fields 
+            var fnameNode = document.getElementById('firstname');
+            var lnameNode = document.getElementById('lastname');
+            var emailNode = document.getElementById('email') || document.getElementById('reg-email');
+            var dobNode   = document.getElementById('dob');
+            var userNode  = document.getElementById('username');
+            var passNode  = document.getElementById('reg-password');
+            var cpassNode = document.getElementById('reg-cpassword');
+
+            var fname = fnameNode ? fnameNode.value.trim() : '';
+            var lname = lnameNode ? lnameNode.value.trim() : '';
+            var email = emailNode ? emailNode.value.trim() : '';
+            var dob   = dobNode ? dobNode.value.trim() : '';
+            var user  = userNode ? userNode.value.trim() : '';
+            var pass  = passNode ? passNode.value.trim() : '';
+            var cpass = cpassNode ? cpassNode.value.trim() : '';
 
             var isValid = true;
+
+            // Helper function to safely update the DOM without crashing
+            function toggleError(idList, isError) {
+                idList.forEach(function(id) {
+                    var el = document.getElementById(id);
+                    if (el) {
+                        el.style.display = isError ? 'block' : 'none';
+                    }
+                });
+            }
 
             /* 2c. Form Validation to check if fields match or are empty */
             /* 2a. DOM Manipulation to update CSS using JS to display error message */
             
-            if (fname === '') { document.getElementById('user-fname-error').style.display = 'block'; isValid = false; }
-            else { document.getElementById('user-fname-error').style.display = 'none'; }
+            if (fnameNode && fname === '') { toggleError(['user-fname-error', 'firstname-error'], true); isValid = false; }
+            else { toggleError(['user-fname-error', 'firstname-error'], false); }
 
-            if (lname === '') { document.getElementById('user-lname-error').style.display = 'block'; isValid = false; }
-            else { document.getElementById('user-lname-error').style.display = 'none'; }
+            if (lnameNode && lname === '') { toggleError(['user-lname-error', 'lastname-error'], true); isValid = false; }
+            else { toggleError(['user-lname-error', 'lastname-error'], false); }
 
-            if (email === '' || !email.includes('@')) { document.getElementById('user-email-error').style.display = 'block'; isValid = false; }
-            else { document.getElementById('user-email-error').style.display = 'none'; }
+            if (emailNode && (email === '' || !email.includes('@'))) { toggleError(['user-email-error', 'email-error', 'reg-email-error'], true); isValid = false; }
+            else { toggleError(['user-email-error', 'email-error', 'reg-email-error'], false); }
 
-            if (dob === '') { document.getElementById('user-dob-error').style.display = 'block'; isValid = false; }
-            else { document.getElementById('user-dob-error').style.display = 'none'; }
+            if (dobNode && dob === '') { toggleError(['user-dob-error', 'dob-error'], true); isValid = false; }
+            else { toggleError(['user-dob-error', 'dob-error'], false); }
 
-            if (user === '') { document.getElementById('username-error').style.display = 'block'; isValid = false; }
-            else { document.getElementById('username-error').style.display = 'none'; }
+            if (userNode && user === '') { toggleError(['user-username-error', 'username-error'], true); isValid = false; }
+            else { toggleError(['user-username-error', 'username-error'], false); }
 
-            if (pass === '') { document.getElementById('user-password-error').style.display = 'block'; isValid = false; }
-            else { document.getElementById('user-password-error').style.display = 'none'; }
+            if (passNode && pass === '') { toggleError(['user-password-error', 'password-error', 'reg-password-error'], true); isValid = false; }
+            else { toggleError(['user-password-error', 'password-error', 'reg-password-error'], false); }
 
-            if (pass !== cpass || cpass === '') { document.getElementById('user-cpassword-error').style.display = 'block'; isValid = false; }
-            else { document.getElementById('user-cpassword-error').style.display = 'none'; }
+            if (cpassNode && (pass !== cpass || cpass === '')) { toggleError(['user-cpassword-error', 'cpassword-error'], true); isValid = false; }
+            else { toggleError(['user-cpassword-error', 'cpassword-error'], false); }
 
-            // If everything passed validation, save to localStorage
             if (isValid) {
                 var userData = { firstname: fname, username: user, password: pass };
                 localStorage.setItem('ippliance_user', JSON.stringify(userData));
