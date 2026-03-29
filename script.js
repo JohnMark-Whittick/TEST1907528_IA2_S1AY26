@@ -86,8 +86,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('Welcome back to I-ppliance!');
                 window.location.href = 'index.html';
             } else {
-                userErr.innerText = 'Invalid credentials'; userErr.style.display='block';
-                passErr.innerText = 'Invalid credentials'; passErr.style.display='block';
+                userErr.innerText = 'Invalid Username'; userErr.style.display='block';
+                passErr.innerText = 'Invalid Password'; passErr.style.display='block';
             }
         });
     }
