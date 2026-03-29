@@ -109,6 +109,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (document.getElementById('close-btn')) document.getElementById('close-btn').onclick = () => window.location.href='index.html';
     if (document.getElementById('clear-btn')) document.getElementById('clear-btn').onclick = () => document.getElementById('checkout-form').reset();
 });
+
+/* CORE MATH FUNCTIONS */
 function displayCart() {
     var container = document.querySelector('#cart-container');
     var cart = JSON.parse(localStorage.getItem('ippliance_cart')) || [];
@@ -126,7 +128,6 @@ function displayCart() {
         let itemSub = item.price * item.quantity;
         subtotal += itemSub; totalQty += item.quantity;
         
-        /* Restored the image tag and the div wrapper for flexbox alignment */
         html += `<div class="cart-item">
                     <img src="${item.image}" class="cart-img" style="width: 80px; border-radius: 8px;">
                     <div style="flex: 1; margin-left: 20px; text-align: left;">
@@ -155,21 +156,6 @@ function displayCart() {
                 <a href="checkout.html" class="btn checkout-link-btn">Proceed to Checkout</a>
              </div>`;
              
-    container.innerHTML = html;
-}
-
-    /* 2d. Advanced Logic: Discount & Tax */
-    let discount = (totalQty >= 3) ? (subtotal * 0.10) : 0;
-    let tax = (subtotal - discount) * 0.15;
-    let grand = (subtotal - discount) + tax;
-
-    html += `<div class="summary" style="background:#eee; padding:15px; margin-top:10px; border-radius:8px;">
-                <p>Sub-total: J$${subtotal.toLocaleString()}</p>
-                <p style="color:red;">Discount (10%): -J$${discount.toLocaleString()}</p>
-                <p>GCT (15%): J$${tax.toLocaleString()}</p>
-                <hr><h3>Total: J$${grand.toLocaleString()}</h3>
-                <a href="checkout.html" class="btn">Checkout</a>
-             </div>`;
     container.innerHTML = html;
 }
 
