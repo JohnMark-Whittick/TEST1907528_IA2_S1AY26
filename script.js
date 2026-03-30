@@ -1,10 +1,5 @@
-/* ============================================
-   IA#2 - script.js - I-ppliance
-   Student: John-Mark Whittick | ID#: 1907528
-   Module: CIT2011 | Assignment: IA#2 (Individual)
-   ============================================ */
 
-/* 2d. Logic: data storage and organization using arrays and objects */
+/*2d. Basic Interactivity & Logic  for Data storage and arrays */
 var products = [
     { id: 1,  name: "Sharp Microwave",               category: "kitchen",       price: 18500,  image: "microwave.jpg" },
     { id: 2,  name: "Oster Blender",                 category: "kitchen",       price: 7500,   image: "blender.jpg" },
@@ -36,40 +31,48 @@ var products = [
     { id: 28, name: "Ryobi Heat Gun",                category: "tools",         price: 11000,  image: "heatgun.jpg" }
 ];
 
-/* 2b. Event Handling: DOMContentLoaded */
+/* 2b. Event Handling & Working event listener for page load */
 document.addEventListener('DOMContentLoaded', function() {
     updateCartIcon();
     setupMobileNav();
 
-    /* --- PAGE INITIALIZERS & PROMO ALERT --- */
+    /* 2a. DOM Manipulation to update HTML via displayProducts */
     if (document.querySelector('#productgrid')) { 
         displayProducts(products); 
         
-        // Show promo alert only once using localStorage
+        /* 2d. Basic Interactivity & Logic Control structures for Promo Alert */
         if (!localStorage.getItem('ippliance_promo_seen')) {
             alert("Special Deal: Get 10% off your subtotal when you purchase 3 or more items!");
             localStorage.setItem('ippliance_promo_seen', 'true');
         }
     }
+
+   
     
     if (document.querySelector('#cart-container')) { displayCart(); }
     if (document.querySelector('#checkout-summary')) { displayCheckoutSummary(); }
 
-    /* --- CATEGORY FILTER LOGIC --- */
+    
     var categoryBtns = document.querySelectorAll('.category-btn');
     categoryBtns.forEach(btn => {
+        /* 2b. Event Handling listener for buttons */
         btn.addEventListener('click', function() {
             var category = this.getAttribute('data-category');
+            
+            /* 2a. DOM Manipulation updating CSS classes */
             categoryBtns.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
+            
+            /* 2d. Basic Interactivity & Logic using filter logic on arrays*/
             var filtered = (category === 'all') ? products : products.filter(p => p.category === category);
             displayProducts(filtered);
         });
     });
 
-    /* --- LOGIN LOGIC --- */
+    /* 2c. Form Validation / Input Handling*/
     var loginBtn = document.getElementById('loginbtn');
     if (loginBtn) {
+        /* 2b. Event Handling for login form submission */
         loginBtn.addEventListener('click', function(e) {
             e.preventDefault();
             var userIn = document.getElementById('login-username').value.trim();
@@ -77,6 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
             var userErr = document.getElementById('username-error');
             var passErr = document.getElementById('password-error');
             
+            /* 2c. Form Validation / Input Handling which checks for empty fields & DOM updates) */
             if (userIn === '') { userErr.innerText = 'Username required'; userErr.style.display='block'; return; }
             else { userErr.style.display='none'; }
             
@@ -94,11 +98,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    /* --- REGISTRATION LOGIC --- */
+    /* 2c. Form Validation / Input Handling*/
     var regBtn = document.getElementById('registerbtn');
     if (regBtn) {
         regBtn.addEventListener('click', function(e) {
             e.preventDefault();
+            /*  2a. DOM Manipulation functions */
             var fn = document.getElementById('firstname').value.trim();
             var ln = document.getElementById('lastname').value.trim();
             var em = document.getElementById('email').value.trim();
@@ -108,8 +113,10 @@ document.addEventListener('DOMContentLoaded', function() {
             var cp = document.getElementById('reg-cpassword').value.trim();
 
             var valid = true;
+            /* IA#2 Rubric: 2c. Form Validation / Input Handling which uses JS functions to update DOM with errors*/
             function toggleErr(id, show) { var el = document.getElementById(id); if (el) el.style.display = show ? 'block' : 'none'; }
 
+            /* 2c. Form Validation for Checking empty fields and validating email input */
             if (fn==='') { toggleErr('user-fname-error', true); valid=false; } else { toggleErr('user-fname-error', false); }
             if (ln==='') { toggleErr('user-lname-error', true); valid=false; } else { toggleErr('user-lname-error', false); }
             if (em==='' || !em.includes('@')) { toggleErr('user-email-error', true); valid=false; } else { toggleErr('user-email-error', false); }
@@ -126,22 +133,23 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    /* --- CHECKOUT PAGE BUTTONS --- */
+    /*2a. DOM Manipulation*/
     var confBtn = document.getElementById('confirm-order-btn');
     if (confBtn) {
         confBtn.addEventListener('click', function(e) {
             e.preventDefault();
             
-            var fn = document.getElementById('firstname') ? document.getElementById('firstname').value.trim() : '';
-            var ln = document.getElementById('lastname') ? document.getElementById('lastname').value.trim() : '';
-            var em = document.getElementById('email') ? document.getElementById('email').value.trim() : '';
-            var ph = document.getElementById('phone') ? document.getElementById('phone').value.trim() : '';
-            var ad = document.getElementById('address') ? document.getElementById('address').value.trim() : '';
+             var fn = document.getElementById('firstname') ? document.getElementById('firstname').value.trim() : '';
+              var ln = document.getElementById('lastname') ? document.getElementById('lastname').value.trim() : '';
+              var em = document.getElementById('email') ? document.getElementById('email').value.trim() : '';
+               var ph = document.getElementById('phone') ? document.getElementById('phone').value.trim() : '';
+              var ad = document.getElementById('address') ? document.getElementById('address').value.trim() : '';
             var pa = document.getElementById('parish') ? document.getElementById('parish').value : '';
 
             var valid = true;
             function toggleChkErr(id, show) { var el = document.getElementById(id); if (el) el.style.display = show ? 'block' : 'none'; }
 
+            /* 2c. Form Validation / Input Handling for Checkout field validations */
             if (document.getElementById('firstname') && fn==='') { toggleChkErr('user-fname-error', true); valid=false; } else { toggleChkErr('user-fname-error', false); }
             if (document.getElementById('lastname') && ln==='') { toggleChkErr('user-lname-error', true); valid=false; } else { toggleChkErr('user-lname-error', false); }
             if (document.getElementById('email') && (em==='' || !em.includes('@'))) { toggleChkErr('user-email-error', true); valid=false; } else { toggleChkErr('user-email-error', false); }
@@ -149,6 +157,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (document.getElementById('address') && ad==='') { toggleChkErr('user-address-error', true); valid=false; } else { toggleChkErr('user-address-error', false); }
             if (document.getElementById('parish') && pa==='') { toggleChkErr('user-parish-error', true); valid=false; } else { toggleChkErr('user-parish-error', false); }
 
+            /*2d. Basic Interactivity / Logic Control structures for checkout completion*/
             if (valid) {
                 alert('Thank you for your order! It is now being processed.'); 
                 localStorage.removeItem('ippliance_cart'); 
@@ -167,10 +176,8 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 });
 
-/* ============================================
-   CORE MATH & UI FUNCTIONS
-   ============================================ */
 
+/* 2a. DOM Manipulation to dynamically update HTML using JS innerHTML */
 function displayCart() {
     var container = document.querySelector('#cart-container');
     var cart = JSON.parse(localStorage.getItem('ippliance_cart')) || [];
@@ -201,7 +208,7 @@ function displayCart() {
                  </div>`;
     });
 
-    /* 2d. Advanced Logic: Discount & Tax */
+    /* 2d. Basic Interactivity / Logic  calculations for discount and tax */
     let discount = (totalQty >= 3) ? (subtotal * 0.10) : 0;
     let taxableAmount = subtotal - discount;
     let tax = taxableAmount * 0.15;
@@ -257,6 +264,7 @@ function displayCheckoutSummary() {
 }
 
 function displayProducts(list) {
+    /* 2a. DOM Manipulation querySelector*/
     var grid = document.querySelector('#productgrid');
     if (!grid) return;
     grid.innerHTML = '';
@@ -276,6 +284,7 @@ function addToCart(id) {
     var product = products.find(p => p.id === id);
     var existing = cart.find(item => item.id === id);
 
+    /*2d. Basic Interactivity / Logic Control structures for cart count */
     if (existing) { existing.quantity += 1; }
     else { cart.push({...product, quantity: 1}); }
 
@@ -302,6 +311,7 @@ function updateCartIcon() {
     var cart = JSON.parse(localStorage.getItem('ippliance_cart')) || [];
     var count = cart.reduce((sum, item) => sum + item.quantity, 0);
     
+    /*2a. DOM Manipulation to dynamically update HTML with nav items */
     var navLinks = document.querySelectorAll('nav a');
     navLinks.forEach(link => {
         if (link.getAttribute('href') === 'cart.html' || link.textContent.toLowerCase().includes('cart')) {
